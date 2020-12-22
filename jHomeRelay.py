@@ -5,6 +5,13 @@ import modules.PriorityQueue as PriorityQueue
 GPIO_RELAY_PIN = 11
 COM_PORT = 40000
 
+"""
+jHomeRelay
+@author: Jerome Leibacher, 2020
+This code is for the design jHomeRelay Node.
+The hardware consists of a Raspberry Pi 0, an Grove Relay 250V - 10A and an BME280 meteo sensor.
+"""
+
 
 class JHomeRelay(object):
 
@@ -15,9 +22,9 @@ class JHomeRelay(object):
         self._task_queue = PriorityQueue.PriorityQueue()
 
         # temporary fixed time interval of 60 mins
-        self._relay_time_schedule["fixed"] = 60
+        self._relay_time_schedule["fixed"] = {"time": 60}
 
-        # start relay_handler
+        # setup relay_handler
         self._relay_handler = RelayHandler.RelayHandler()
         self._relay_handler.set_gpio_pin(GPIO_RELAY_PIN)
 
@@ -25,7 +32,7 @@ class JHomeRelay(object):
 
     def start_event_loop(self):
         is_running = True
-        
+
         while is_running:
 
             ### handle task_queue things ###
@@ -41,7 +48,7 @@ class JHomeRelay(object):
                     # fixed interval is available -> starting now
                     self._relay_tasks["start"] = n_time
                     self._relay_tasks["stop"] = n_time + \
-                                                datetime.timedelta(minutes=self._relay_time_schedule.get("fixed"))
+                                                datetime.timedelta(minutes=self._relay_time_schedule["fixed"].get("time"))
 
                     # remove entry in time_schedule
                     self._relay_time_schedule.pop("fixed")
@@ -56,7 +63,7 @@ class JHomeRelay(object):
                             self._relay_tasks["start"] = event_info.get("start")
                             self._relay_tasks["stop"] = event_info.get("stop")
                             # remove entry from time_schedule
-                            self._relay_time_schedule["timer"].pop(event_info)
+                            self._relay_time_schedule["timer"].pop(event_name)
                             break
 
             if "start" in self._relay_tasks:

@@ -27,7 +27,7 @@ class BME280(object):
 
     def __init__(self):
 
-        self.DEVICE = 0x76  # Default device I2C address
+        self.DEVICE = 0x77  # Default device I2C address
         self.sensorName = ""
         # Rev 2 Pi, Pi 2 & Pi 3 uses bus 1, Rev 1 Pi uses bus 0
         self.bus = smbus.SMBus(1)

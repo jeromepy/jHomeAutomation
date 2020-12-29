@@ -1,8 +1,11 @@
+import asyncio
 import datetime
 import modules.Relay_Handler as RelayHandler
 import modules.PriorityQueue as PriorityQueue
+import modules.Meteo_handler as MeteoHandler
+import modules.Socket_handler as SocketHandler
 
-GPIO_RELAY_PIN = 11
+GPIO_RELAY_PIN = 17
 COM_PORT = 40000
 
 """
@@ -21,16 +24,14 @@ class JHomeRelay(object):
         self._relay_tasks = dict()
         self._task_queue = PriorityQueue.PriorityQueue()
 
-        # temporary fixed time interval of 60 mins
-        self._relay_time_schedule["fixed"] = {"time": 60}
+        # temporary fixed time interval of 5 mins
+        self._relay_time_schedule["fixed"] = {"time": 5}
 
         # setup relay_handler
         self._relay_handler = RelayHandler.RelayHandler()
         self._relay_handler.set_gpio_pin(GPIO_RELAY_PIN)
 
-        self.start_event_loop()
-
-    def start_event_loop(self):
+    async def start_event_loop(self):
         is_running = True
 
         while is_running:
@@ -79,6 +80,7 @@ class JHomeRelay(object):
                     self._relay_tasks.pop("stop")
 
             ### handle meteo_data
+            await asyncio.sleep(1)
             pass
 
         # end of script -> do cleanup
@@ -88,10 +90,26 @@ class JHomeRelay(object):
 
         pass
 
-    def init_server_socket(self):
 
-        pass
+async def main():
+
+    main_loop = JHomeRelay()
+    meteo_loop = MeteoHandler.MeteoHandler()
+    socket_loop = SocketHandler.SocketHandler()
+
+    main_task = loop.create_task(main_loop.start_event_loop())
+    meteo_task = loop.create_task(meteo_loop.record_loop())
+    socket_task = loop.create_task(socket_loop.socket_loop())
+
+    await asyncio.wait([main_task, meteo_task, socket_task])
+    return True
 
 
 if __name__ == "__main__":
-    jHome = JHomeRelay()
+    try:
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(main())
+    except KeyboardInterrupt:
+        print("Keyboard interrupted happened -> loop will be closed...")
+    finally:
+        loop.close()

@@ -18,7 +18,7 @@
 # https://www.raspberrypi-spy.co.uk/
 #
 # --------------------------------------
-import smbus2
+import smbus
 import time
 from ctypes import c_short
 
@@ -29,8 +29,8 @@ class BME280(object):
 
         self.DEVICE = 0x76  # Default device I2C address
         self.sensorName = ""
-        self.bus = smbus2.SMBus(1) # Rev 2 Pi, Pi 2 & Pi 3 uses bus 1, Rev 1 Pi uses bus 0
-        #self.bus = smbus.SMBus(1)
+        # Rev 2 Pi, Pi 2 & Pi 3 uses bus 1, Rev 1 Pi uses bus 0
+        self.bus = smbus.SMBus(1)
 
 
     def setDevice(self, deviceHex):

@@ -1,12 +1,13 @@
-# import RPI.GPIO as GPIO
+# import RPi.GPIO as GPIO
 
 class RelayHandler(object):
 
     def __init__(self):
-        self.gpio_pin = 11
+        self.gpio_pin = 17
         self.relay_state = 0  # open relay
 
-        # GPIO.setup(self.gpio_pin, GPIO.out, initial=GPIO.LOW)
+        # GPIO.setmode(GPIO.BCM)
+        # GPIO.setup(self.gpio_pin, GPIO.OUT, initial=GPIO.LOW)
 
     def set_gpio_pin(self, p_number):
 
@@ -15,7 +16,7 @@ class RelayHandler(object):
 
         self.gpio_pin = p_number
         # init new pin out number
-        # GPIO.setup(self.gpio_pin, GPIO.out, initial=GPIO.LOW)
+        # GPIO.setup(self.gpio_pin, GPIO.OUT, initial=GPIO.LOW)
 
     def close_relay(self):
         # relay is closing -> current can flow

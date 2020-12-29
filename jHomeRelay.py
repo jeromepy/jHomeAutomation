@@ -22,7 +22,7 @@ class JHomeRelay(object):
 
         self._relay_time_schedule = dict()
         self._relay_tasks = dict()
-        self._task_queue = PriorityQueue.PriorityQueue()
+        self.task_queue = PriorityQueue.PriorityQueue()
 
         # temporary fixed time interval of 5 mins
         self._relay_time_schedule["fixed"] = {"time": 5}
@@ -37,8 +37,8 @@ class JHomeRelay(object):
         while is_running:
 
             ### handle task_queue things ###
-            while self._task_queue.length() > 0:
-                n_task = self._task_queue.pop()
+            while self.task_queue.length() > 0:
+                n_task = self.task_queue.pop()
                 self.process_task(n_task)
 
             ### handle relay things ###
@@ -79,23 +79,23 @@ class JHomeRelay(object):
                     # remove stop task
                     self._relay_tasks.pop("stop")
 
-            ### handle meteo_data
             await asyncio.sleep(1)
-            pass
 
         # end of script -> do cleanup
         self._relay_handler.do_cleanup()
 
     def process_task(self, n_task):
 
-        pass
-
+        if "type" in n_task:
+            print("Received Task type: " + n_task.get("type"))
 
 async def main():
 
     main_loop = JHomeRelay()
     meteo_loop = MeteoHandler.MeteoHandler()
+    meteo_loop.link_queue(main_loop.task_queue)
     socket_loop = SocketHandler.SocketHandler()
+    socket_loop.link_queue(main_loop.task_queue)
 
     main_task = loop.create_task(main_loop.start_event_loop())
     meteo_task = loop.create_task(meteo_loop.record_loop())

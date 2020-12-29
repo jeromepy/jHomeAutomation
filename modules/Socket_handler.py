@@ -1,5 +1,6 @@
 import asyncio
 import datetime
+import modules.PriorityQueue as PriorityQueue
 import socket
 
 
@@ -8,8 +9,11 @@ class SocketHandler:
     def __init__(self):
 
         self.is_running = False
-
+        self.queue_link = None
         self.comm = None
+
+    def link_queue(self, queue_object: PriorityQueue.PriorityQueue()):
+        self.queue_link = queue_object
 
     async def socket_loop(self):
 

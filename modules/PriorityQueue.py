@@ -8,7 +8,7 @@ class PriorityQueue():
         self._queue = []
         self._index = 0
 
-    def push(self, item: any, priority: int):
+    def push(self, item, priority: int):
 
         if priority > 5:
             priority = 5

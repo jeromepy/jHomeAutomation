@@ -28,7 +28,7 @@ class JHomeRelay(object):
         self.task_queue = PriorityQueue.PriorityQueue()
 
         # temporary fixed rule-book (for testing)
-        self._rules = {"X24B2": {"name": "timer_1", "trigger": {"time": {"start": "20:30", "end": "20:45"}},
+        self._rules = {"X24B2": {"name": "timer_1", "trigger": {"time": {"start": "21:45", "end": "23:00"}},
                        "action": {"do": "ON", "block": False, "time": 60}}}
         self._relay_time_schedule["fixed"] = {"time": 5}
 
@@ -83,7 +83,7 @@ class JHomeRelay(object):
 
     def process_task(self, n_task):
 
-        meteo_path = "home/pi/Documents/jHomeAutomation/meteotest.txt"
+        meteo_path = "/home/pi/Documents/jHomeAutomation/meteotest.txt"
         timestamp = datetime.datetime.now().strftime("%H:%M:%S %d.%m.%Y")
         if "type" in n_task:
             print("Received Task type: " + n_task.get("type"))
@@ -92,7 +92,7 @@ class JHomeRelay(object):
                     with open(meteo_path, "w") as init_file:
                         init_file.write("Time, Temp (C), Rel.hum. (%), Pressure (mbar)\n")
                 with open(meteo_path, "a") as meteo_file:
-                    meteo_file.write(timestamp + ' {temperature:.2f}, {humidity:.1f}, {pressure:.2f}'.format(**n_task))
+                    meteo_file.write(timestamp + ' {temperature:.2f}, {humidity:.1f}, {pressure:.2f}\n'.format(**n_task))
 
     def check_rules(self, n_time: datetime.datetime):
 

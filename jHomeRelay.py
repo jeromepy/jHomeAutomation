@@ -81,15 +81,15 @@ class JHomeRelay(object):
     def process_task(self, n_task):
 
         meteo_path = "home/pi/Documents/jHomeAutomation/meteotest.txt"
-
+        timestamp = datetime.datetime.now().strftime("%H:%M:%S %d.%m.%Y")
         if "type" in n_task:
             print("Received Task type: " + n_task.get("type"))
             if n_task.get("type") == "meteo":
                 if not os.path.exists(meteo_path):
                     with open(meteo_path, "w") as init_file:
-                        init_file.write("Origin, Temp (C), Pressure (mbar), Rel.hum. (%)\n")
+                        init_file.write("Time, Temp (C), Rel.hum. (%), Pressure (mbar)\n")
                 with open(meteo_path, "a") as meteo_file:
-                    meteo_file.write('{origin}, {temperature:.2f}, {humidity:.1f}, {pressure:.2f}'.format(**n_task))
+                    meteo_file.write(timestamp + ' {temperature:.2f}, {humidity:.1f}, {pressure:.2f}'.format(**n_task))
 
     def check_rules(self, n_time: datetime.datetime):
 

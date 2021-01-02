@@ -26,7 +26,9 @@ class JHomeRelay(object):
         self._relay_tasks = dict()
         self.task_queue = PriorityQueue.PriorityQueue()
 
-        # temporary fixed time interval of 5 mins
+        # temporary fixed rule-book (for testing)
+        self.rules = {"X24B2": {"name": "timer_1", "trigger": {"time": {"start": "18:30", "end": "18:45"}},
+                       "action": {"do": "ON", "block": False, "time": 60}}}
         self._relay_time_schedule["fixed"] = {"time": 5}
 
         # setup relay_handler
@@ -51,29 +53,13 @@ class JHomeRelay(object):
 
             ### handle relay things ###
             n_time = datetime.datetime.now()
-            if len(self._relay_time_schedule) > 0:
+            if len(self._rules) > 0:
 
-                if "fixed" in self._relay_time_schedule:
-                    # fixed interval is available -> starting now
-                    self._relay_tasks["start"] = n_time
-                    self._relay_tasks["stop"] = n_time + \
-                                                datetime.timedelta(minutes=self._relay_time_schedule["fixed"].get("time"))
-
-                    # remove entry in time_schedule
-                    self._relay_time_schedule.pop("fixed")
-
-                elif "timer" in self._relay_time_schedule:
-                    # timed event of relay
-
-                    for event_name, event_info in self._relay_time_schedule["timer"].items():
-                        if event_info.get("start") < datetime.datetime.now():
-                            # event should be started
-                            print("Event " + event_name + " will be started")
-                            self._relay_tasks["start"] = event_info.get("start")
-                            self._relay_tasks["stop"] = event_info.get("stop")
-                            # remove entry from time_schedule
-                            self._relay_time_schedule["timer"].pop(event_name)
-                            break
+                pos_action = self.check_rules(n_time)
+                if pos_action:
+                    print(f'Action started -> {pos_action.get("id", "")}')
+                    self._relay_tasks["start"] = pos_action.get("start")
+                    self._relay_tasks["stop"] = pos_action.get("stop")
 
             if "start" in self._relay_tasks:
                 if self._relay_tasks.get("start") < n_time:
@@ -108,19 +94,40 @@ class JHomeRelay(object):
     def check_rules(self, n_time: datetime.datetime):
 
         n_time_hour = n_time.time()
-        time_action = dict()
+        time_action = None
         event_action = None
-        block_action = None
 
-        for rule in self._rules:
+        for ident, rule in enumerate(self._rules):
             if "time" in rule.get("trigger", ""):
                 start_time = datetime.datetime.strptime(rule["time"]["start"], "%H:%M")
                 end_time = datetime.datetime.strptime(rule["time"]["end"], "%H:%M")
                 if n_time_hour > start_time.time():
-                    time_action["start"] = n_time
-                    time_action["stop"] = n_time + (end_time - start_time)
-                    if start_time > end_time:
-                        time_action["stop"] += datetime.timedelta(days=1)
+                    time_action = dict()
+                    print(f'Timer-Event {ident} triggered at {n_time}')
+                    time_action["id"] = ident
+                    if rule["action"]["do"] == "ON":
+                        time_action["start"] = n_time
+                        time_action["stop"] = n_time + (end_time - start_time)
+                        if start_time > end_time:
+                            time_action["stop"] += datetime.timedelta(days=1)
+                    elif rule["action"]["do"] == "OFF":
+                        time_action["stop"] = n_time
+                        if rule["action"]["block"]:
+                            time_action["stop_block"] = rule["action"]["time"]
+            elif "event" in rule.get("trigger", ""):
+                if "rel" in rule["trigger"]["event"].get("type", ""):
+                    pass
+                if "abs" in rule["trigger"]["event"].get("type", ""):
+                    pass
+
+        # check different actions according to priority
+        # highest to lowest: OFF-blockings, time-based, event-based
+        if time_action:
+            return time_action
+        if event_action:
+            return event_action
+        return None
+
 
 async def main():
 
@@ -140,8 +147,8 @@ async def main():
 
 
 if __name__ == "__main__":
+    loop = asyncio.get_event_loop()
     try:
-        loop = asyncio.get_event_loop()
         loop.run_until_complete(main())
     except KeyboardInterrupt:
         print("Keyboard interrupted happened -> loop will be closed...")

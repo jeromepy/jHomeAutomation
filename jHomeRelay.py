@@ -23,11 +23,12 @@ class JHomeRelay(object):
 
         self._relay_time_schedule = dict()
         self._rules = dict()
+        self.current_task_running = -1
         self._relay_tasks = dict()
         self.task_queue = PriorityQueue.PriorityQueue()
 
         # temporary fixed rule-book (for testing)
-        self.rules = {"X24B2": {"name": "timer_1", "trigger": {"time": {"start": "18:30", "end": "18:45"}},
+        self._rules = {"X24B2": {"name": "timer_1", "trigger": {"time": {"start": "18:30", "end": "18:45"}},
                        "action": {"do": "ON", "block": False, "time": 60}}}
         self._relay_time_schedule["fixed"] = {"time": 5}
 
@@ -57,7 +58,9 @@ class JHomeRelay(object):
 
                 pos_action = self.check_rules(n_time)
                 if pos_action:
-                    print(f'Action started -> {pos_action.get("id", "")}')
+                    print(f'Action starting -> {pos_action.get("id", "")}')
+                    self.current_task_running = pos_action.get("id")
+                    print("Inserting start timestamp: " + str(pos_action.get("start")))
                     self._relay_tasks["start"] = pos_action.get("start")
                     self._relay_tasks["stop"] = pos_action.get("stop")
 
@@ -97,10 +100,10 @@ class JHomeRelay(object):
         time_action = None
         event_action = None
 
-        for ident, rule in enumerate(self._rules):
+        for ident, rule in self._rules.items():
             if "time" in rule.get("trigger", ""):
-                start_time = datetime.datetime.strptime(rule["time"]["start"], "%H:%M")
-                end_time = datetime.datetime.strptime(rule["time"]["end"], "%H:%M")
+                start_time = datetime.datetime.strptime(rule["trigger"]["time"]["start"], "%H:%M")
+                end_time = datetime.datetime.strptime(rule["trigger"]["time"]["end"], "%H:%M")
                 if n_time_hour > start_time.time():
                     time_action = dict()
                     print(f'Timer-Event {ident} triggered at {n_time}')
@@ -123,9 +126,11 @@ class JHomeRelay(object):
         # check different actions according to priority
         # highest to lowest: OFF-blockings, time-based, event-based
         if time_action:
-            return time_action
+            if self.current_task_running != time_action.get("id"):
+                return time_action
         if event_action:
-            return event_action
+            if self.current_task_running != event_action.get("id"):
+                return event_action
         return None
 
 

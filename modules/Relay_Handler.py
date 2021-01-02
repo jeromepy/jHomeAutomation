@@ -7,6 +7,7 @@ class RelayHandler(object):
         self.relay_state = 0  # open relay
 
         GPIO.setmode(GPIO.BCM)
+        GPIO.setwarnings(False)
         GPIO.setup(self.gpio_pin, GPIO.OUT, initial=GPIO.LOW)
 
     def set_gpio_pin(self, p_number):

@@ -1,5 +1,6 @@
 import asyncio
 import datetime
+import os
 import modules.Relay_Handler as RelayHandler
 import modules.PriorityQueue as PriorityQueue
 import modules.Meteo_handler as MeteoHandler
@@ -21,6 +22,7 @@ class JHomeRelay(object):
     def __init__(self):
 
         self._relay_time_schedule = dict()
+        self._rules = dict()
         self._relay_tasks = dict()
         self.task_queue = PriorityQueue.PriorityQueue()
 
@@ -30,6 +32,12 @@ class JHomeRelay(object):
         # setup relay_handler
         self._relay_handler = RelayHandler.RelayHandler()
         self._relay_handler.set_gpio_pin(GPIO_RELAY_PIN)
+
+        # queue object of socket_handler
+        self.socket_queue = None
+
+    def set_comm_queue_link(self, comm_queue):
+        self.socket_queue = comm_queue
 
     async def start_event_loop(self):
         is_running = True
@@ -86,8 +94,33 @@ class JHomeRelay(object):
 
     def process_task(self, n_task):
 
+        meteo_path = "home/pi/Documents/jHomeAutomation/meteotest.txt"
+
         if "type" in n_task:
             print("Received Task type: " + n_task.get("type"))
+            if n_task.get("type") == "meteo":
+                if not os.path.exists(meteo_path):
+                    with open(meteo_path, "w") as init_file:
+                        init_file.write("Origin, Temp (C), Pressure (mbar), Rel.hum. (%)\n")
+                with open(meteo_path, "a") as meteo_file:
+                    meteo_file.write('{origin}, {temperature:.2f}, {humidity:.1f}, {pressure:.2f}'.format(**n_task))
+
+    def check_rules(self, n_time: datetime.datetime):
+
+        n_time_hour = n_time.time()
+        time_action = dict()
+        event_action = None
+        block_action = None
+
+        for rule in self._rules:
+            if "time" in rule.get("trigger", ""):
+                start_time = datetime.datetime.strptime(rule["time"]["start"], "%H:%M")
+                end_time = datetime.datetime.strptime(rule["time"]["end"], "%H:%M")
+                if n_time_hour > start_time.time():
+                    time_action["start"] = n_time
+                    time_action["stop"] = n_time + (end_time - start_time)
+                    if start_time > end_time:
+                        time_action["stop"] += datetime.timedelta(days=1)
 
 async def main():
 
@@ -96,6 +129,7 @@ async def main():
     meteo_loop.link_queue(main_loop.task_queue)
     socket_loop = SocketHandler.SocketHandler()
     socket_loop.link_queue(main_loop.task_queue)
+    main_loop.set_comm_queue_link(socket_loop.get_comm_queue_link())
 
     main_task = loop.create_task(main_loop.start_event_loop())
     meteo_task = loop.create_task(meteo_loop.record_loop())

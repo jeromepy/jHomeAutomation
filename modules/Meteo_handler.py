@@ -26,7 +26,7 @@ class MeteoHandler:
             temp, press, hum = self.bme280.readBME280All()
             print(f"Meteo data: {temp:.2f} °C, {press:.3f} mbar, {hum:.1f} % rel. hum.")
             task = dict()
-            task["type"] = "meteodata"
+            task["type"] = "meteo"
             task["origin"] = "jHomeRelay"
             task["temperature"] = temp
             task["pressure"] = press

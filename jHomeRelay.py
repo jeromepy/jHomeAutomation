@@ -60,9 +60,9 @@ class JHomeRelay(object):
                 if pos_action:
                     print(f'Action starting -> {pos_action.get("id", "")}')
                     self.current_task_running = pos_action.get("id")
-                    print("Inserting start timestamp: " + str(pos_action.get("start")))
                     self._relay_tasks["start"] = pos_action.get("start")
                     self._relay_tasks["stop"] = pos_action.get("stop")
+                    self._relay_tasks["eot"] = pos_action.get("eot")
 
             if "start" in self._relay_tasks:
                 if self._relay_tasks.get("start") < n_time:
@@ -75,6 +75,10 @@ class JHomeRelay(object):
                     self._relay_handler.open_relay()
                     # remove stop task
                     self._relay_tasks.pop("stop")
+            if "eot" in self._relay_tasks:
+                if self._relay_tasks.get("eot") < n_time:
+                    # end of task reached -> reset current_task_running
+                    self.current_task_running = -1
 
             await asyncio.sleep(1)
 
@@ -119,10 +123,11 @@ class JHomeRelay(object):
                     if rule["action"]["do"] == "ON":
                         time_action["start"] = start_time
                         time_action["stop"] = end_time
+                        time_action["eot"] = end_time
                     elif rule["action"]["do"] == "OFF":
                         time_action["stop"] = start_time
                         if rule["action"]["block"]:
-                            time_action["stop_block"] = rule["action"]["time"]
+                            time_action["eot"] = start_time + datetime.timedelta(minutes=int(rule["action"]["time"]))
             elif "event" in rule.get("trigger", ""):
                 if "rel" in rule["trigger"]["event"].get("type", ""):
                     pass

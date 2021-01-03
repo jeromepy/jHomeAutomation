@@ -87,7 +87,7 @@ class JHomeRelay(object):
 
     def process_task(self, n_task):
 
-        meteo_path = "/home/pi/Documents/jHomeAutomation/meteotest.txt"
+        meteo_path = "/home/pi/Documents/meteotest.txt"
         timestamp = datetime.datetime.now().strftime("%H:%M:%S %d.%m.%Y")
         if "type" in n_task:
             print("Received Task type: " + n_task.get("type"))

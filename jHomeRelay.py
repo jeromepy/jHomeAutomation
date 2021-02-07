@@ -10,7 +10,6 @@ import modules.PriorityQueue as PriorityQueue
 import config
 import modules.Meteo_handler as MeteoHandler
 import modules.Socket_handler as SocketHandler
-import modules.Notifier as Notifier
 
 GPIO_RELAY_PIN = 17
 COM_PORT = 40000
@@ -31,8 +30,7 @@ class JHomeRelay(object):
 
         # initialize global variables
         config.init()
-        NOTIFIER = Notifier.Notifier()
-        NOTIFIER.subscribe(self)  # add itself to subscribers
+        config.NOTIFIER.subscribe(self)  # add itself to subscribers
 
         self._rules = dict()
         self.meteo_state = dict()

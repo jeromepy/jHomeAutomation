@@ -42,7 +42,7 @@ class MeteoHandler:
             self.temp_data.append(temp)
             self.hum_data.append(hum)
 
-            config.NOTIFIER.publish(task, {"priority": 1})
+            config.NOTIFIER.publish(task, **{"priority": 1})
 
             await asyncio.sleep(60)
 

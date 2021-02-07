@@ -113,7 +113,7 @@ class JHomeRelay(object):
 
         if r_state == 1:
             # relay is currently closed -> humifier is running
-            if (t_now - r_last_close) > datetime.timedelta(minutes=20):
+            if r_last_close is not None and (t_now - r_last_close) > datetime.timedelta(minutes=20):
                 # check if humidity is going up -> if not -> publish empty tank message
                 if "dH_20" in meteo_state:
                     if meteo_state.get("dH_20") < 0:
@@ -122,14 +122,15 @@ class JHomeRelay(object):
 
         elif r_state == 0:
             # relay is currently open
-            if (t_now - r_last_open) < datetime.timedelta(minutes=self._rules.get("min_pause")):
+            if r_last_open is not None and \
+                    (t_now - r_last_open) <datetime.timedelta(minutes=self._rules.get("min_pause")):
                 # still in pause situation -> do nothing
                 return
             if "dH_20" in meteo_state:
                 if meteo_state.get("dH_20") > 0:
                     # humidity is rising without humifier -> do nothing
                     return
-            if "dH_last" in meteo_state:
+            if "H_last" in meteo_state:
                 if self._rules.get("des_hum") > meteo_state.get("dH_last"):
                     # current humidity is lower than desired humidity
                     start_humi = True

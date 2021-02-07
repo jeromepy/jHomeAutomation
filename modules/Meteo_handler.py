@@ -31,19 +31,20 @@ class MeteoHandler:
 
             # read data and push
             temp, press, hum = self.bme280.readBME280All()
-            print(f"Meteo data: {temp:.2f} °C, {press:.3f} mbar, {hum:.1f} % rel. hum.")
+            # print(f"Meteo data: {temp:.2f} °C, {press:.3f} mbar, {hum:.1f} % rel. hum.")
             task = dict()
             task["type"] = "meteo"
             task["origin"] = "jHomeRelay"
-            task["temperature"] = temp
-            task["pressure"] = press
-            task["humidity"] = hum
+            task["temperature"] = round(temp, 1)
+            task["pressure"] = round(press, 2)
+            task["humidity"] = round(hum, 2)
 
             self.temp_data.append(temp)
             self.hum_data.append(hum)
 
             config.NOTIFIER.publish(task, **{"priority": 1})
 
+            self.analyze_meteodata()
             await asyncio.sleep(60)
 
     def analyze_meteodata(self):

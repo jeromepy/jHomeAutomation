@@ -80,7 +80,7 @@ class JHomeRelay(object):
         event_path = "home/pi/Documents/eventtest.txt"
         timestamp = utils.get_current_timestamp()
         if "type" in n_task:
-            print("Received Task type: " + n_task.get("type"))
+            # print("Received Task type: " + n_task.get("type"))
             if n_task.get("type") == "meteo":
                 if not os.path.exists(meteo_path):
                     with open(meteo_path, "w") as init_file:

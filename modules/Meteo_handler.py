@@ -88,4 +88,4 @@ class MeteoHandler:
 
         # Publish results
         if len(results):
-            config.NOTIFIER.publish({"info": "meteo_analysis", "mess": results})
+            config.NOTIFIER.publish({"type": "meteo_analysis", "mess": results})

@@ -81,10 +81,10 @@ class MeteoHandler:
 
         # add last values
         if temp_data.size > 0:
-            results["T_last"] = float(temp_data[:1])
+            results["T_last"] = float(temp_data[-1])
 
         if hum_data.size > 0:
-            results["H_last"] = float(hum_data[:1])
+            results["H_last"] = float(hum_data[-1])
 
         # Publish results
         if len(results):

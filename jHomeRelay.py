@@ -38,7 +38,7 @@ class JHomeRelay(object):
 
         # temporary fixed rule-book (for testing)
         self._rules = {"block_hours": {"1": "06:00-08:00", "2": "17:00-18:30"},
-                       "des_hum": 33.5, "min_runtime": 60, "min_pause": 120}
+                       "des_hum": 40.5, "min_runtime": 60, "min_pause": 120}
 
         # setup relay_handler
         self._relay_handler = RelayHandler.RelayHandler()

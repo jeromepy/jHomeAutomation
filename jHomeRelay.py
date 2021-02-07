@@ -38,7 +38,7 @@ class JHomeRelay(object):
 
         # temporary fixed rule-book (for testing)
         self._rules = {"block_hours": {"1": "06:00-08:00", "2": "17:00-18:30"},
-                       "des_hum": 40.5, "min_runtime": 60, "min_pause": 120}
+                       "des_hum": 37.0, "min_runtime": 60, "min_pause": 120}
 
         # setup relay_handler
         self._relay_handler = RelayHandler.RelayHandler()
@@ -149,6 +149,8 @@ class JHomeRelay(object):
             self._relay_tasks["start"] = utils.get_current_time()
             self._relay_tasks["stop"] = utils.get_current_time() + \
                                         datetime.timedelta(minutes=self._rules.get("min_runtime"))
+            config.NOTIFIER.publish({"type": "event",
+                                     "mess": f'Relay closed, running for {self._rules.get("min_runtime")} minutes'})
 
 
 async def main():

@@ -1,6 +1,10 @@
-rules = {"X24B2": {"name": "timer_1", "trigger": {"time": {"start": "18:30", "end": "18:45"}},
-                       "action": {"do": "ON", "block": False, "time": 60}}}
+import datetime
 
-for ident, rule in rules.items():
-    print(ident)
-    print(str(rule))
+def get_current_timestamp():
+    return datetime.datetime.now().strftime("%H:%M:%S %d.%m.%Y")
+
+def get_current_time():
+    return datetime.datetime.now()
+
+def get_current_day():
+    return datetime.date.today()

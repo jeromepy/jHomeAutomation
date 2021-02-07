@@ -3,8 +3,8 @@ import datetime
 import modules.PriorityQueue as PriorityQueue
 import socket
 
-JHOMESERVER_ADRESS = "192.168.1.100"
-JHOMESERVER_PORT = 40000
+
+STD_PORT = 40000
 
 
 class SocketHandler:

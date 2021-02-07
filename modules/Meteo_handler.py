@@ -42,7 +42,7 @@ class MeteoHandler:
             self.temp_data.append(temp)
             self.hum_data.append(hum)
 
-            NOTIFIER.publish(task, {"priority": 1})
+            config.NOTIFIER.publish(task, {"priority": 1})
 
             await asyncio.sleep(60)
 
@@ -87,4 +87,4 @@ class MeteoHandler:
 
         # Publish results
         if len(results):
-            NOTIFIER.publish({"info": "meteo_analysis", "mess": results})
+            config.NOTIFIER.publish({"info": "meteo_analysis", "mess": results})

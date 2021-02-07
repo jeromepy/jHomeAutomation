@@ -118,7 +118,7 @@ class JHomeRelay(object):
                 if "dH_20" in meteo_state:
                     if meteo_state.get("dH_20") < 0:
                         print("--> Event: Tank is probably empty. Humidity is not increasing during runtime")
-                        NOTIFIER.publish({"type": "event", "mess": "Tank looks to be emtpy. Please refill"})
+                        config.NOTIFIER.publish({"type": "event", "mess": "Tank looks to be emtpy. Please refill"})
 
         elif r_state == 0:
             # relay is currently open

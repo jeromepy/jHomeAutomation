@@ -77,7 +77,7 @@ class JHomeRelay(object):
     def process_mess(self, n_task):
 
         meteo_path = "/home/pi/Documents/meteotest.txt"
-        event_path = "home/pi/Documents/eventtest.txt"
+        event_path = "/home/pi/Documents/eventtest.txt"
         timestamp = utils.get_current_timestamp()
         if "type" in n_task:
             print("Received Task type: " + n_task.get("type"))

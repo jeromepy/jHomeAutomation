@@ -1,17 +1,19 @@
 import asyncio
 import datetime
 import os
-import numpy
+import sys
+
+sys.path.append('../')
 import modules.utils as utils
 import modules.Relay_Handler as RelayHandler
 import modules.PriorityQueue as PriorityQueue
+import config
 import modules.Meteo_handler as MeteoHandler
 import modules.Socket_handler as SocketHandler
 import jHomeRelay_Notifier as Notifier
 
 GPIO_RELAY_PIN = 17
 COM_PORT = 40000
-global NOTIFIER
 
 """
 jHomeRelay
@@ -27,6 +29,8 @@ class JHomeRelay(object):
 
         self.recv_mess = PriorityQueue.PriorityQueue()
 
+        # initialize global variables
+        config.init()
         NOTIFIER = Notifier.Notifier()
         NOTIFIER.subscribe(self)  # add itself to subscribers
 

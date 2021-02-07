@@ -5,8 +5,7 @@ import numpy as np
 import sklearn.linear_model as LinearRegression
 import modules.PriorityQueue as PriorityQueue
 import modules.Meteo_BME280 as Meteo_BME280
-
-global NOTIFIER
+import config
 
 
 class MeteoHandler:
@@ -16,7 +15,7 @@ class MeteoHandler:
         self.is_running = False
         self.recv_mess = PriorityQueue.PriorityQueue()
 
-        NOTIFIER.subscribe(self)
+        config.NOTIFIER.subscribe(self)
 
         self.bme280 = Meteo_BME280.BME280()
 

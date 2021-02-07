@@ -1,5 +1,3 @@
-import glob
-import modules.utils
 
 """
 Notifier class

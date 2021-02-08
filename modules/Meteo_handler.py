@@ -69,15 +69,15 @@ class MeteoHandler:
             if temp_data.size >= calc_dT:
                 x = np.linspace(1, calc_dT, calc_dT).reshape(-1, 1)
                 model = LinearRegression.LinearRegression()
-                model.fit(x, temp_data[calc_dT:])
-                results["dT_" + str(calc_dT)] = model.coef_
+                model.fit(x, temp_data[-calc_dT:])
+                results["dT_" + str(calc_dT)] = float(model.coef_)
 
         for calc_dH in calc_dH_coeffs:
             if hum_data.size >= calc_dH:
                 x = np.linspace(1, calc_dH, calc_dH).reshape(-1, 1)
                 model = LinearRegression.LinearRegression()
-                model.fit(x, hum_data[calc_dH:])
-                results["dH_" + str(calc_dH)] = model.coef_
+                model.fit(x, hum_data[-calc_dH:])
+                results["dH_" + str(calc_dH)] = float(model.coef_)
 
         # add last values
         if temp_data.size > 0:

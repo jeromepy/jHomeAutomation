@@ -45,6 +45,6 @@ class Notifier(object):
 
         print(f'Starting to publish message: {str(mess)}')
         for subsc in self.observers:
-            print(f'Class {str(subsc)} has been notified')
+            print(f'[{subsc.__class__.__name__}] has been notified')
             subsc.recv_mess.push(mess, prio)
         return True

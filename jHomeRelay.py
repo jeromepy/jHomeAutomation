@@ -68,6 +68,9 @@ class JHomeRelay(object):
                     self._relay_handler.open_relay()
                     # remove stop task
                     self._relay_tasks.pop("stop")
+                    if "start" in self._relay_tasks:
+                        # remove start action if existing
+                        self._relay_tasks.pop("start")
 
             await asyncio.sleep(1)
 
@@ -106,6 +109,9 @@ class JHomeRelay(object):
         :return:
         """
 
+        print("Given meteo analysis data:")
+        for key, value in meteo_state.items():
+            print(f'{key}: {value:.2f}')
         r_state, r_last_close, r_last_open = self._relay_handler.get_relay_state()
 
         t_now = datetime.datetime.now()
@@ -113,12 +119,17 @@ class JHomeRelay(object):
 
         if r_state == 1:
             # relay is currently closed -> humifier is running
+            # check after 20minutes, if humidity is increasing -> if not -> publish empty tank message
             if r_last_close is not None and (t_now - r_last_close) > datetime.timedelta(minutes=20):
-                # check if humidity is going up -> if not -> publish empty tank message
                 if "dH_20" in meteo_state:
                     if meteo_state.get("dH_20") < 0:
                         print("--> Event: Tank is probably empty. Humidity is not increasing during runtime")
                         config.NOTIFIER.publish({"type": "event", "mess": "Tank looks to be emtpy. Please refill"})
+            if "dT_10" in meteo_state:
+                if meteo_state.get("dT_10") < 0.2:  # Temperature falling more than 2°C/10mins
+                    config.NOTIFIER.publish({"type": "event", "mess": "Open windows detected -> stop running humifier"})
+                    self._relay_tasks["stop"] = t_now
+                    return
 
         elif r_state == 0:
             # relay is currently open

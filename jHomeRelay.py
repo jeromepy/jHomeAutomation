@@ -119,15 +119,18 @@ class JHomeRelay(object):
 
         if r_state == 1:
             # relay is currently closed -> humifier is running
-            # check after 20minutes, if humidity is increasing -> if not -> publish empty tank message
-            if r_last_close is not None and (t_now - r_last_close) > datetime.timedelta(minutes=20):
+            # check after 30minutes, if humidity is increasing -> if not -> publish empty tank message
+            if r_last_close is not None and (t_now - r_last_close) > datetime.timedelta(minutes=30):
                 if "dH_20" in meteo_state:
                     if meteo_state.get("dH_20") < 0:
                         print("--> Event: Tank is probably empty. Humidity is not increasing during runtime")
-                        config.NOTIFIER.publish({"type": "event", "mess": "Tank looks to be emtpy. Please refill"})
+                        config.NOTIFIER.publish({"type": "event",
+                                                 "mess": f'Tank looks to be emtpy. '
+                                                         f'(dH_20 = {meteo_state.get("dH_20"):.2f})'})
             if "dT_10" in meteo_state:
-                if meteo_state.get("dT_10") < -0.2:  # Temperature falling more than 2°C/10mins
-                    config.NOTIFIER.publish({"type": "event", "mess": "Open windows detected -> stop running humifier"})
+                if meteo_state.get("dT_10") < -0.1:  # Temperature falling more than 1°C/10mins
+                    config.NOTIFIER.publish({"type": "event",
+                                             "mess": f'Open windows detected (dT_10 = {meteo_state.get("dT_10"):.2f}'})
                     self._relay_tasks["stop"] = t_now
                     return
 

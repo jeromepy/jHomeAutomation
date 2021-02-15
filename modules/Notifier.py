@@ -43,8 +43,8 @@ class Notifier(object):
         else:
             prio = 1
 
-        print(f'Starting to publish message: {str(mess)}')
+        #  print(f'Starting to publish message: {str(mess)}')
         for subsc in self.observers:
-            print(f'[{subsc.__class__.__name__}] has been notified')
+            #  print(f'[{subsc.__class__.__name__}] has been notified')
             subsc.recv_mess.push(mess, prio)
         return True

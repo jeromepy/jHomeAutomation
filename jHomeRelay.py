@@ -38,7 +38,7 @@ class JHomeRelay(object):
 
         # temporary fixed rule-book (for testing)
         self._rules = {"block_hours": {"1": "06:00-08:00", "2": "17:00-19:00"},
-                       "des_hum": 37.0, "min_runtime": 60, "min_pause": 180}
+                       "des_hum": 32.0, "min_runtime": 60, "min_pause": 180}
 
         # setup relay_handler
         self._relay_handler = RelayHandler.RelayHandler()
@@ -166,6 +166,10 @@ class JHomeRelay(object):
             if "dH_60" in meteo_state:
                 if meteo_state.get("dH_60") < -0.3 / 60:  # -0.3% within 60min
                     print(f'Relay will be closed (dH_60< 0.3%) -> {meteo_state.get("dH_60"):.3f}')
+                    start_humi = True
+            if "dH_last" in meteo_state:
+                if self._rules.get("des_hum", 101) < meteo_state.get("dH_last"):
+                    print(f'Relay will be closed (des_hum < {meteo_state.get("dH_last"):.3f})')
                     start_humi = True
 
         if start_humi:

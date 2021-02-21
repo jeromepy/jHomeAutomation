@@ -168,7 +168,7 @@ class JHomeRelay(object):
                     print(f'Relay will be closed (dH_60< 0.3%) -> {meteo_state.get("dH_60"):.3f}')
                     start_humi = True
             if "dH_last" in meteo_state:
-                if self._rules.get("des_hum", 101) < meteo_state.get("dH_last"):
+                if self._rules.get("des_hum", 0) > meteo_state.get("dH_last"):
                     print(f'Relay will be closed (des_hum < {meteo_state.get("dH_last"):.3f})')
                     start_humi = True
 

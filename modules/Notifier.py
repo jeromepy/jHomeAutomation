@@ -23,17 +23,17 @@ class Notifier(object):
             return True
 
         self.observers.append(subscriber)
-        print(f'Class {str(subscriber)} has been added to subscribers')
+        #  print(f'Class {str(subscriber)} has been added to subscribers')
         return True
 
     def unsubscribe(self, subscriber):
 
         if subscriber in self.observers:
             self.observers.remove(subscriber)
-            print(f'Class {str(subscriber)} has been un-subscribed.')
+            # print(f'Class {str(subscriber)} has been un-subscribed.')
             return True
         else:
-            print(f'Class {str(subscriber)} wanted to un-subscribe, but was not subscribed...')
+            # print(f'Class {str(subscriber)} wanted to un-subscribe, but was not subscribed...')
             return False
 
     def publish(self, mess: dict, **kwargs):
@@ -45,6 +45,6 @@ class Notifier(object):
 
         #  print(f'Starting to publish message: {str(mess)}')
         for subsc in self.observers:
-            #  print(f'[{subsc.__class__.__name__}] has been notified')
+            # print(f'[{subsc.__class__.__name__}] has been notified')
             subsc.recv_mess.push(mess, prio)
         return True
